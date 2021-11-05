@@ -1,0 +1,19 @@
+#!/bin/bash
+set -u
+
+BASENAME="$(basename -- "${BASH_SOURCE[0]}")"
+DIRNAME="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+UNITNAME="${BASENAME#start-}-${1?}"
+EXECUTABLE="${BASENAME#start-}"
+
+systemctl stop --user \
+  "${UNITNAME}.service" 2>/dev/null
+systemctl reset-failed --user \
+  "${UNITNAME}.service" 2>/dev/null
+
+systemd-run --pipe --user --wait \
+  -p NotifyAccess=all \
+  -p WatchdogSec=60 \
+  --service-type=notify \
+  --unit="${UNITNAME}" \
+  "${DIRNAME}/${EXECUTABLE}" "$@"

@@ -4,11 +4,12 @@ Various helpers for my personal Sway configuration.
 
 ## Overview
 
-(tbd)
+- `i3status-custom` expands upon the `i3status` command and adds
+  custom modules to your status bar.
 
 ## Prerequisites
 
-This tool requires Sway and Linux.
+This suite of helpers requires Sway or i3. It also requires Linux.
 
 ## Installation
 
@@ -16,21 +17,29 @@ This tool requires Sway and Linux.
 
 To install `swimprove` manually:
 
-(tbd)
+1. Make sure all dependencies are installed: Sway (or i3),
+   `i3status`, `jq`, and `systemd`.
 
-### Installing via the Arch User Repository (AUR)
-
-To install `swimprove` via the [AUR](https://wiki.archlinux.org/title/Arch_User_Repository), use your favorite AUR helper to install the [swimprove](https://aur.archlinux.org/packages/swimprove/) package.
-
-For example, if you use [aurutils](https://github.com/AladW/aurutils), run `aur sync swimprove` and then `sudo pacman -Syu swimprove`.
+2. Copy the contents of `bin` and `libexec` into a single directory
+   named `libexec`. The directory must be named `libexec`.
 
 ## Configuration
 
-(tbd)
+1. Create one or more i3status configuration files and put them
+   into your home directory as `.i3status-${flavor}.conf`.
+   For example: `~/.i3status-standard.conf` and
+   `~/.i3status-hidpi.conf`.
+
+2. In your Sway config (or i3 config), add `bar` blocks as needed.
+
+3. Inside the `bar` blocks, set `start-i3status-custom ${flavor}`
+   as the `status_command`.
+   For example: `start-i3status-custom hidpi`
 
 ## Usage
 
-(tbd)
+Reload your Sway or i3 configuration for the custom status command
+to take effect.
 
 ## License
 
