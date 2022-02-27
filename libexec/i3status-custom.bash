@@ -6,6 +6,40 @@ function __i3status_custom__ping_watchdog {
 
 export -f __i3status_custom__ping_watchdog
 
+function __i3status_custom__build_patch_map {
+  local flavor
+  local user_instance_state
+  local system_instance_state
+
+  flavor="${1?}"
+  set --
+
+  # Patch pending_reboot
+  set -- "$@" --arg holder__pending_reboot \
+    "$((RANDOM % 1000)): ${flavor}"
+
+  # Patch systemd_system_instance_state
+  if ! system_instance_state="$(systemctl is-system-running)"; then
+    set -- "$@" --argjson extra__holder__systemd_system_instance_state \
+      '{ "color": "#FF0000" }'
+  fi
+  set -- "$@" --arg holder__systemd_system_instance_state \
+    "system ${system_instance_state}"
+
+  # Patch systemd_user_instance_state
+  if ! user_instance_state="$(systemctl --user is-system-running)"; then
+    set -- "$@" --argjson extra__holder__systemd_user_instance_state \
+      '{ "color": "#FF0000" }'
+  fi
+  set -- "$@" --arg holder__systemd_user_instance_state \
+    "user ${user_instance_state}"
+
+  # Write patch map to stdout
+  jq -n "$@" '$ARGS.named'
+}
+
+export -f __i3status_custom__build_patch_map
+
 function __i3status_custom {
   local flavor
 
@@ -23,12 +57,15 @@ function __i3status_custom {
           read line
           __i3status_custom__ping_watchdog
           echo "${line}"
-          jq -nr --arg a "$((RANDOM % 1000)): ${flavor}" '$a | @json'
+          __i3status_custom__build_patch_map "${flavor}"
         done \
-      | jq -cM --unbuffered \
-        --arg 'instance' 'holder__pending_reboot' \
-        '(.[] | select(.instance == $instance)) |=
-          . + {"full_text": input}' \
+      | jq -cM --unbuffered '
+        input as $patch_map
+        | ((.[] | select(.instance // empty | in($patch_map)))
+        |= . + { "full_text" : $patch_map[.instance] })
+        | ((.[] | select("extra__\(.instance)" | in($patch_map)))
+        |= . + $patch_map["extra__\(.instance)"])
+        ' \
       | sed -u -e 's/^/,/'
   }
 }
