@@ -15,7 +15,7 @@ function __i3status_custom {
     head -3
     sed -u -e 's/^,//' \
       | while true; do
-          read line
+          read -r line
           __ping_watchdog
           echo "${line}"
           __build_patch_map "${flavor}"
