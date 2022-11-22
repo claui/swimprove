@@ -1,3 +1,4 @@
+source libexec/widget-fan-rpm.bash
 source libexec/widget-pending-reboot.bash
 source libexec/widget-service-state.bash
 
@@ -24,6 +25,8 @@ function __build_patch_map {
     'user' \
     -- \
     systemctl --user is-system-running
+
+  __widget__fan_rpm 'holder__fan_rpm' 0
 
   # Write patch map to stdout
   jq -n "${args[@]}" '$ARGS.named'
