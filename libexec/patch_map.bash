@@ -1,4 +1,5 @@
 source libexec/widget-fan-rpm.bash
+source libexec/widget-gpu-busy-percent.bash
 source libexec/widget-pending-reboot.bash
 source libexec/widget-service-state.bash
 
@@ -27,6 +28,8 @@ function __build_patch_map {
     systemctl --user is-system-running
 
   __widget__fan_rpm 'holder__fan_rpm' 0
+
+  __widget_gpu_busy_percent 'holder__gpu1_busy' 'card1'
 
   # Write patch map to stdout
   jq -n "${args[@]}" '$ARGS.named'
