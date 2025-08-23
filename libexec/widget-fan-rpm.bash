@@ -1,7 +1,7 @@
 # Populates a custom i3status widget with the current fan speed.
 #
 # Usage:
-# __widget__fan_rpm PLACEHOLDER
+# __widget__fan_rpm PLACEHOLDER FAN_ID
 #
 # where:
 #   PLACEHOLDER the ID of the custom i3status widget we want to patch
@@ -20,7 +20,9 @@
 function __widget__fan_rpm {
   local fan_id
   local placeholder_id
-  local rpm
+  local fan_duty
+  local fan_duty_percentage
+  # 📌🌬
 
   placeholder_id="${1?}"
   shift
@@ -38,12 +40,13 @@ function __widget__fan_rpm {
     return
   fi
 
-  rpm="$(
-    sudo ectool pwmgetfanrpm "${fan_id}" \
-      | sed -n 's/Fan [0-9] RPM: //p'
+  fan_duty="$(
+    sudo ectool pwmgetduty "${fan_id}" \
+      | sed -n 's/Current PWM duty: //p'
   )"
+  fan_duty_percentage="$(( (fan_duty + 1) * 100 / 65535 ))"
   args=("${args[@]}" --arg
-    "${placeholder_id}" "${rpm} min⁻¹")
+    "${placeholder_id}" "${fan_duty_percentage}%")
 }
 
 export -f __widget__fan_rpm
