@@ -40,8 +40,12 @@ function __widget_gpu_busy_percent {
   fi
 
   read -r gpu_busy_percentage < "/sys/class/drm/${card_id}/device/gpu_busy_percent"
-  args=("${args[@]}" --arg
-    "${placeholder_id}" "${gpu_busy_percentage}%")
+  args=(
+    "${args[@]}"
+    --arg
+    "${placeholder_id}"
+    "$(printf 'GPU %02d%%' "${gpu_busy_percentage}")"
+  )
 }
 
 export -f __widget_gpu_busy_percent
